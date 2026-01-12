@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <base target="_top">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SSK Open House 2026: นิทรรศการชายแดนไทย-กัมพูชา</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Itim&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Itim', cursive; background-color: #f0f4f8; }
+        h1, h2, h3, button, input, select { font-family: 'Itim', cursive; }
+        
+        /* ธีมสี ไทย-กัมพูชา */
+        .bg-theme-header { background: linear-gradient(135deg, #003580 0%, #ce1126 100%); }
+        
+        .btn-option { 
+            background-color: white; 
+            border: 2px solid #e2e8f0; 
+            color: #4a5568; 
+        }
+        .btn-option:hover { 
+            background-color: #ebf8ff; 
+            border-color: #003580; 
+            color: #003580; 
+        }
+        
+        .btn-selected {
+            background-color: #003580 !important;
+            color: white !important;
+            border-color: #003580 !important;
+            transform: scale(1.01);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .spinner { border: 4px solid #e5e7eb; border-top: 4px solid #ce1126; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 20px auto; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        .hidden { display: none; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center py-8 px-4 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]">
+
+    <div class="w-full max-w-3xl bg-white rounded-2xl shadow-xl overflow-hidden mb-6 border-b-8 border-[#ce1126]">
+        <div class="bg-theme-header p-8 text-center text-white relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-full h-full opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cartographer.png')]"></div>
+            <div class="relative z-10">
+                <span class="inline-block px-3 py-1 bg-white/20 rounded-full text-xs mb-3 backdrop-blur-sm border border-white/30">SSK Open House 2026</span>
+                <h1 class="text-2xl md:text-3xl font-bold mb-2 drop-shadow-md">นิทรรศการความสัมพันธ์ชายแดนไทย-กัมพูชา</h1>
+                <p class="text-blue-100 text-lg mt-2">เรียนรู้กลไกความร่วมมือ MOU 2543 และการแก้ปัญหาเขตแดนอย่างสันติวิธี</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="w-full max-w-3xl bg-white rounded-2xl shadow-lg p-6 md:p-10 relative min-h-[400px]">
+        
+        <div id="page-register">
+            <div class="text-center mb-8 border-b pb-4"><h2 class="text-2xl font-bold text-gray-800">ลงทะเบียนเข้าร่วมกิจกรรม</h2></div>
+            <div class="space-y-5">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-gray-700 text-lg mb-2">คำนำหน้า</label>
+                        <select id="prefix" class="w-full bg-gray-50 border border-gray-300 rounded-lg p-3 text-lg">
+                            <option value="เด็กชาย">เด็กชาย</option><option value="เด็กหญิง">เด็กหญิง</option>
+                            <option value="นาย">นาย</option><option value="นางสาว">นางสาว</option>
+                        </select>
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-gray-700 text-lg mb-2">ชื่อจริง</label>
+                        <input type="text" id="firstname" class="w-full bg-gray-50 border border-gray-300 rounded-lg p-3 text-lg" placeholder="ภาษาไทยเท่านั้น">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-gray-700 text-lg mb-2">นามสกุล</label>
+                    <input type="text" id="lastname" class="w-full bg-gray-50 border border-gray-300 rounded-lg p-3 text-lg" placeholder="ภาษาไทยเท่านั้น">
+                </div>
+                <button onclick="startQuiz()" class="w-full bg-gradient-to-r from-[#003580] to-[#004a99] text-white font-bold py-4 rounded-xl shadow-lg hover:shadow-xl transition duration-300 mt-6 text-xl">เริ่มทำแบบทดสอบ</button>
+            </div>
+        </div>
+
+        <div id="page-quiz" class="hidden">
+            <div class="flex justify-between items-center mb-6">
+                <span class="text-sm font-bold text-[#ce1126] bg-red-50 px-3 py-1 rounded-full border border-red-100">คำถาม</span>
+                <div class="text-gray-400 text-lg"><span id="progress-text" class="text-gray-800 font-bold text-xl">1</span> / 10</div>
+            </div>
+            <div class="mb-8"><h2 id="question-text" class="text-xl md:text-2xl font-bold text-gray-800 leading-relaxed">...</h2></div>
+            <div id="choices-area" class="space-y-3"></div>
+            <div class="mt-8 pt-4 border-t flex justify-between">
+                <button id="btn-back" onclick="prevQuestion()" class="px-5 py-2 rounded-lg bg-gray-100 text-gray-600 hidden text-lg">ย้อนกลับ</button>
+            </div>
+        </div>
+
+        <div id="page-loading" class="hidden flex flex-col items-center justify-center py-12">
+            <div class="spinner mb-4"></div>
+            <h3 class="text-xl font-bold text-gray-700">กำลังประมวลผลคะแนน...</h3>
+            <p class="text-gray-500 text-lg mt-2">กรุณารอสักครู่ ระบบกำลังตรวจคำตอบ</p>
+        </div>
+
+        <div id="page-result" class="hidden text-center py-4">
+            <div id="result-icon" class="text-7xl mb-4 animate-bounce"></div>
+            <h2 class="text-3xl font-bold text-gray-800 mb-2">ผลการทดสอบ</h2>
+            <p id="user-display" class="text-[#003580] text-xl font-semibold mb-6"></p>
+            <div class="bg-gray-50 rounded-2xl p-6 mb-6 border border-gray-200">
+                <span id="score-text" class="text-6xl font-bold text-gray-800">0</span> / 10
+            </div>
+            
+            <div id="pass-section" class="hidden">
+                <div class="bg-green-50 text-green-700 px-4 py-3 rounded-lg mb-6 text-lg">ยินดีด้วย! คุณผ่านเกณฑ์การประเมิน</div>
+                <a id="cert-link" href="#" class="w-full block bg-green-600 text-white font-bold py-3 px-6 rounded-xl shadow-md mb-3 text-lg transition">ดาวน์โหลดเกียรติบัตร</a>
+            </div>
+
+            <div id="fail-section" class="hidden">
+                <div class="bg-red-50 text-red-700 px-4 py-3 rounded-lg mb-6 text-lg">เสียใจด้วย คุณยังไม่ผ่านเกณฑ์</div>
+                <button onclick="resetQuiz()" class="w-full bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-xl text-lg transition">ทำแบบทดสอบใหม่</button>
+            </div>
+            
+            <button onclick="resetQuiz()" id="btn-home-pass" class="hidden w-full bg-white border border-gray-300 text-gray-700 font-bold py-3 px-6 rounded-xl mt-2 text-lg hover:bg-gray-50 transition">กลับหน้าหลัก</button>
+        </div>
+    </div>
+    
+    <div class="mt-8 text-center text-gray-500 text-lg pb-8">
+        <p class="font-bold">ห้องเรียนพิเศษนิติศาสตร์ - รัฐศาสตร์ (LAWPOL)</p>
+        <p>โรงเรียนสตรีสิริเกศ | Develop By LAPSBOY</p>
+    </div>
+
+    <script>
+        // ==========================================
+        // *** สำคัญ: วาง URL ที่ได้จากการ Deploy ใหม่ ตรงนี้ ***
+        const GAS_URL = 'https://script.google.com/macros/s/AKfycbyo6vyFgPOLTP6THqZx1vK9JWd33uhWhKDC5Ad8B42rWNUS_tTE-xSmtZ9wQ-mPMZwP/exec'; 
+        // ==========================================
+
+        const questions = [
+            { q: "1. วัตถุประสงค์หลักของ \"MOU 2543\" (MOU 2000) ระหว่างไทย-กัมพูชา คือเรื่องใด", 
+            a: ["การร่วมมือทางการค้าและเศรษฐกิจชายแดน", 
+            "การสำรวจและจัดทำหลักเขตแดนทางบก", 
+            "การยกเว้นวีซ่าสำหรับนักท่องเที่ยวของทั้งสองประเทศ", 
+            "การแลกเปลี่ยนวัฒนธรรมและศิลปะ"] },
+
+            { q: "2. ข้อใดกล่าวถูกต้องเกี่ยวกับ \"อนุสัญญาออตตาวา\" (Ottawa Treaty)", 
+            a: ["เป็นสนธิสัญญาเกี่ยวกับการเปลี่ยนแปลงสภาพภูมิอากาศ", 
+            "เป็นข้อตกลงห้ามใช้ สะสม ผลิต และโอนทุ่นระเบิดสังหารบุคคล", 
+            "เป็นข้อตกลงการค้าเสรีระหว่างทวีปอเมริกาเหนือ", 
+            "เป็นกฎหมายทะเลและการเดินเรือระหว่างประเทศ"] },
+
+            { q: "3. คณะกรรมาธิการเขตแดนร่วมไทย-กัมพูชา ใช้อักษรย่อว่าอะไร", 
+            a: ["GBC", 
+            "JBC", 
+            "RBC", 
+            "ICJ"] },
+
+            { q: "4. หน่วยงานใดมีหน้าที่พิจารณาข้อพิพาททางกฎหมายระหว่างรัฐ", 
+            a: ["ศาลอาญาระหว่างประเทศ (ICC)", 
+            "องค์การการค้าโลก (WTO)", 
+            "ศาลยุติธรรมระหว่างประเทศ (ICJ)", 
+            "คณะมนตรีความมั่นคงแห่งสหประชาชาติ (UNSC)"] },
+
+            { q: "5. หากต้องการแก้ไขปัญหาความไม่เรียบร้อยตามแนวชายแดนในระดับ \"ท้องถิ่น\" หรือ \"ภูมิภาค\" ควรใช้กลไกใด", 
+            a: ["JBC", 
+            "MOU 2543", 
+            "RBC", 
+            "ICJ"] },
+
+            { q: "ข้อใดวิเคราะห์ความสัมพันธ์ระหว่าง \"อนุสัญญาออตตาวา\" กับ \"การสำรวจเขตแดน\" ได้สมเหตุสมผลที่สุด", 
+            a: ["การมีทุ่นระเบิดช่วยให้เส้นเขตแดนมีความชัดเจนขึ้น", 
+            "อนุสัญญาออตตาวาห้ามการสำรวจเขตแดนในพื้นที่สู้รบ", 
+            "การเก็บกู้ทุ่นระเบิดตามอนุสัญญาช่วยให้เจ้าหน้าที่เข้าสำรวจพื้นที่เพื่อปักปันเขตแดนได้อย่างปลอดภัย", 
+            "อนุสัญญาออตตาวากำหนดให้ใช้ทุ่นระเบิดเป็นหลักเขตแดนชั่วคราว"] },
+
+            { q: "7. บทบาทของกลไก GBC (General Border Committee) ตรงกับตัวเลือกใดมากที่สุด", 
+            a: ["การศึกษาและวัฒนธรรม", 
+            "ความมั่นคงและความร่วมมือทั่วไปตามแนวชายแดน", 
+            "การตัดสินคดีความระหว่างประเทศ", 
+            "การกำหนดอัตราภาษีศุลกากร"] },
+
+            { q: "8. เหตุใดการมี MOU 2543 จึงถือเป็นวิธี \"สันติวิธี\" ในการแก้ปัญหาเขตแดน", 
+            a: ["เพราะเป็นการตกลงที่จะใช้กำลังทหารตัดสินหากคุยกันไม่รู้เรื่อง", 
+            "เพราะเป็นการยกดินแดนที่มีปัญหาให้เป็นพื้นที่ว่างเปล่า", 
+            "เพราะบังคับให้ประเทศที่สามเข้ามาตัดสินทันที", 
+            "เพราะเป็นการสร้างกรอบกติกาให้สองประเทศเจรจาและสำรวจร่วมกันแทนการเผชิญหน้า"] },
+
+            { q: "9. สิ่งใดปรากฎอยู่ในตราสัญลักษณ์ของศาลยุติธรรมระหว่างประเทศ (ICJ)", 
+            a: ["ตราชั่งแห่งความยุติธรรม", 
+            "ดาบไขว้", 
+            "เคียวของเกษตรกร", 
+            "นกพิราบคาบกิ่งมะกอก"] },
+
+            { q: "10. หากประเทศไทยและกัมพูชาพบว่ามี \"หลักเขตแดน\" บางจุดสูญหายไป หรือไม่ตรงกับแผนที่ กลไกใดมีหน้าที่รับผิดชอบในการลงพื้นที่สำรวจและจัดทำหลักเขตนั้นใหม่ให้ถูกต้องตาม MOU 2543", 
+            a: ["คณะกรรมการชายแดนทั่วไป (GBC)", 
+            "คณะกรรมาธิการเขตแดนร่วม (JBC)", 
+            "ศาลยุติธรรมระหว่างประเทศ (ICJ)", 
+            "กรมที่ดิน"] }
+        ];
+
+        let currentIdx = 0;
+        let userData = {};
+        let userAnswers = new Array(questions.length).fill(null);
+
+        function startQuiz() {
+            const pf = document.getElementById('prefix').value;
+            const fn = document.getElementById('firstname').value.trim();
+            const ln = document.getElementById('lastname').value.trim();
+            if(!fn || !ln) { alert("กรุณากรอกชื่อ-สกุลให้ครบถ้วน"); return; }
+            userData = { prefix: pf, firstname: fn, lastname: ln };
+            document.getElementById('page-register').classList.add('hidden');
+            document.getElementById('page-quiz').classList.remove('hidden');
+            renderQuestion();
+        }
+
+        function resetQuiz() {
+            currentIdx = 0; userData = {}; userAnswers.fill(null);
+            document.getElementById('firstname').value = ""; document.getElementById('lastname').value = "";
+            document.getElementById('page-result').classList.add('hidden');
+            document.getElementById('page-register').classList.remove('hidden');
+        }
+
+        function renderQuestion() {
+            const q = questions[currentIdx];
+            document.getElementById('progress-text').innerText = `${currentIdx+1}`;
+            document.getElementById('question-text').innerText = q.q;
+            const btnBack = document.getElementById('btn-back');
+            currentIdx === 0 ? btnBack.classList.add('hidden') : btnBack.classList.remove('hidden');
+            const area = document.getElementById('choices-area'); area.innerHTML = "";
+            q.a.forEach((ans, idx) => {
+                const btn = document.createElement('div');
+                let css = "btn-option w-full p-4 rounded-xl cursor-pointer transition font-medium text-xl shadow-sm mb-3 ";
+                if (userAnswers[currentIdx] === idx) css = "btn-selected w-full p-4 rounded-xl cursor-pointer transition font-bold text-xl shadow-md mb-3 ";
+                btn.className = css; btn.innerText = ans; btn.onclick = () => selectAnswer(idx);
+                area.appendChild(btn);
+            });
+        }
+
+        function selectAnswer(idx) {
+            userAnswers[currentIdx] = idx;
+            if (currentIdx < questions.length - 1) { currentIdx++; renderQuestion(); } else { submitData(); }
+        }
+
+        function prevQuestion() { if (currentIdx > 0) { currentIdx--; renderQuestion(); } }
+
+        function submitData() {
+            document.getElementById('page-quiz').classList.add('hidden');
+            document.getElementById('page-loading').classList.remove('hidden');
+            document.getElementById('page-loading').classList.add('flex');
+            userData.userAnswers = userAnswers;
+
+            fetch(GAS_URL, {
+                method: 'POST',
+                body: JSON.stringify(userData) // ส่งแบบ Text ธรรมดา เพื่อไม่ให้ติด CORS Preflight
+            })
+            .then(res => res.json())
+            .then(data => showResult(data))
+            .catch(err => {
+                console.error(err);
+                alert("เกิดข้อผิดพลาดในการเชื่อมต่อ: กรุณาตรวจสอบว่าคุณได้นำ URL จาก Google Apps Script มาใส่ถูกต้องหรือไม่");
+                document.getElementById('page-loading').classList.add('hidden');
+                document.getElementById('page-quiz').classList.remove('hidden');
+            });
+        }
+
+        function showResult(response) {
+            document.getElementById('page-loading').classList.add('hidden');
+            document.getElementById('page-loading').classList.remove('flex');
+            document.getElementById('page-result').classList.remove('hidden');
+
+            const score = response.score || 0;
+            document.getElementById('user-display').innerText = `${userData.prefix}${userData.firstname} ${userData.lastname}`;
+            document.getElementById('score-text').innerText = score;
+
+            if(response.passed) {
+                document.getElementById('result-icon').innerText = "🥇";
+                document.getElementById('pass-section').classList.remove('hidden');
+                document.getElementById('btn-home-pass').classList.remove('hidden');
+                document.getElementById('fail-section').classList.add('hidden');
+                if(response.pdfUrl) document.getElementById('cert-link').href = response.pdfUrl;
+            } else {
+                document.getElementById('result-icon').innerText = "✌️";
+                document.getElementById('fail-section').classList.remove('hidden');
+                document.getElementById('pass-section').classList.add('hidden');
+                document.getElementById('btn-home-pass').classList.add('hidden');
+            }
+        }
+    </script>
+</body>
+</html>
